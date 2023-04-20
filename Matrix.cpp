@@ -214,6 +214,16 @@ void Matrix::eq(Matrix *B) {
     }
 }
 
+Matrix *Matrix::neg() {
+    Matrix* nm = new Matrix(Y,X);
+    for (int i = 0; i < Y; ++i) {
+        for (int j = 0; j < X; ++j) {
+            nm->Mat[i][j]=-Mat[i][j];
+        }
+    }
+    return nm;
+}
+
 
 
 

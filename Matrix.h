@@ -20,11 +20,13 @@ public:
     Matrix* add(Matrix* B);
     Matrix* sub(Matrix* B);
     Matrix* mul(Matrix*B);
+    Matrix* neg();
     void ones();
     void del();
     Matrix* copy();
     double norm();
     void eq(Matrix* B);
+
 
 
     Matrix* D();
