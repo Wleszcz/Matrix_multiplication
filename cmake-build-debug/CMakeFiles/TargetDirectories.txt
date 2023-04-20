@@ -1,0 +1,3 @@
+C:/Users/Wiktor/CLionProjects/Numeryczne2/cmake-build-debug/CMakeFiles/Numeryczne2.dir
+C:/Users/Wiktor/CLionProjects/Numeryczne2/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Wiktor/CLionProjects/Numeryczne2/cmake-build-debug/CMakeFiles/rebuild_cache.dir
