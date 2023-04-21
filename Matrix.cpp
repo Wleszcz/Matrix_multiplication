@@ -26,6 +26,10 @@ Matrix::Matrix(int y,int x) {
     }
 }
 
+Matrix::~Matrix() {
+    del();
+}
+
 void Matrix::print() {
     for (int i = 0; i < Y; ++i) {
         for (int j = 0; j < X; ++j) {
@@ -223,7 +227,6 @@ Matrix *Matrix::neg() {
     }
     return nm;
 }
-
 
 
 

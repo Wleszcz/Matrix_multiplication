@@ -32,6 +32,8 @@ public:
     Matrix* D();
     Matrix* L();
     Matrix* U();
+
+    virtual ~Matrix();
 };
 
 
