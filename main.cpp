@@ -8,6 +8,7 @@ Matrix *Jacobi(Matrix* A,Matrix* b,double tol);
 Matrix *GaussSeidel(Matrix *A, Matrix *p, double tol);
 
 Matrix *forwardSubstitution(Matrix *L, Matrix *b);
+Matrix* backwardSubstitution(Matrix* A, Matrix* b);
 
 int main() {
     const int index[] ={1,8,8,7,3,1};
@@ -18,7 +19,6 @@ int main() {
     Matrix * A =new Matrix(N,N);
 
     A->createBandMatrix(index);
-    A->print();
 
     Matrix * b = new Matrix(N,1);
 
@@ -30,9 +30,9 @@ int main() {
 
 
     //-0.017428
-    A->print();
-    Matrix * x2 = GaussSeidel(A,b,1e-14);
 
+
+    Matrix * x2 = GaussSeidel(A,b,1e-14);
 
     x2->print();
 
@@ -45,11 +45,11 @@ int main() {
 Matrix *GaussSeidel(Matrix *A, Matrix *b, double tol) {
     int N=b->Y;
     Matrix* x = new Matrix(N,1);
-    Matrix* x_pr;
+    Matrix* x_pr = new Matrix(N,1);
+    Matrix* ux = new Matrix(N,1);
     x->ones();
 
     Matrix* D  = A->D();
-    Matrix* DInv = D->inv();
 
     Matrix* L  = A->L();
     Matrix* U  = A->U();
@@ -58,23 +58,22 @@ Matrix *GaussSeidel(Matrix *A, Matrix *b, double tol) {
 
     int iter =0;
     while(err>tol){
-
-        x_pr=x->copy();
+        x_pr->eq(x);
 
         // forward substitution
+
         Matrix *ux=U->mul(x_pr);
+
 
         Matrix * b_ux=b->sub(ux);
 
-        Matrix* z = forwardSubstitution(DL,b_ux);
+        x->eq(forwardSubstitution(DL,b_ux));
 
-        //update solution
-        x = forwardSubstitution(DL,z->neg());
 
-        //x->print();
-
-        err=x_pr->sub(x)->norm();
+        err=((A->mul(x))->sub(b))->norm();
+        //printf("%f\n",err);
         iter++;
+
         if(iter>1000) break;
     }
     return x;
@@ -84,16 +83,38 @@ Matrix* forwardSubstitution(Matrix* L, Matrix* b) {
     int N = b->Y;
     Matrix* x = new Matrix(N, 1);
 
+
+
     for (int i = 0; i < N; i++) {
         double sum = 0.0;
         for (int j = 0; j < i; j++) {
             sum += L->Mat[i][j] * x->Mat[j][0];
         }
-        x->Mat[i][0]=  (b->Mat[i][0]- sum) / L->Mat[i][i];
+        x->Mat[i][0] = (b->Mat[i][0]- sum) / L->Mat[i][i];
     }
 
     return x;
 }
+
+Matrix* backwardSubstitution(Matrix* A, Matrix* b) {
+    int N = b->Y;
+    Matrix* x = new Matrix(N, 1);
+
+    for (int i = N - 1; i >= 0; i--) {
+        double sum = 0.0;
+        for (int j = i + 1; j < N; j++) {
+            sum += A->Mat[i][j] * x->Mat[j][0];
+        }
+        x->Mat[i][0] = (b->Mat[i][0] - sum) / A->Mat[i][i];
+    }
+
+    return x;
+}
+
+
+
+
+
 
 Matrix* Jacobi(Matrix* A,Matrix* b,double tol){
     int N=b->Y;
