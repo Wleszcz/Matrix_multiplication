@@ -1,6 +1,6 @@
 #include "Matrix.h"
 #include "iostream"
-#include "math.h"
+#include <cmath>
 
 
 
@@ -30,7 +30,7 @@ Matrix::~Matrix() {
     del();
 }
 
-void Matrix::print() {
+void Matrix::print() const {
     for (int i = 0; i < Y; ++i) {
         for (int j = 0; j < X; ++j) {
             printf("%f ", Mat[i][j]);
@@ -61,74 +61,74 @@ void Matrix::createBandMatrix(const int *index) {
     }
 }
 
-Matrix* Matrix::D() {
-    if(!isSquare){
-        throw "Matrix is not square!";
+Matrix* Matrix::Diag() {
+    if(isSquare) {
+        auto *D = new Matrix(N, N);
+        for (int i = 0; i < N; ++i) {
+            D->Mat[i][i] = this->Mat[i][i];
+        }
+        D->isDiagonal = true;
+        return D;
     }
-    Matrix *D = new Matrix(N,N);
-    for (int i = 0; i < N; ++i) {
-        D->Mat[i][i]=this->Mat[i][i];
-    }
-    D->isDiagonal=true;
-    return D;
+    throw std::invalid_argument("Diag func. for this type of matrix not implemented!");
 }
 
-Matrix* Matrix::L() {
-    if(!isBand){
-        throw"not implemented!";
-    }
-    Matrix *L = new Matrix(N,N);
+Matrix* Matrix::LDiag() {
+    if(isBand){
+        Matrix *L = new Matrix(N,N);
 
-    for (int i = 0; i < Y; ++i) {
-        for (int j = 0; j < X; ++j) {
-            if (i == j + 1 ) {
-                L->Mat[i][j] = Mat[i][j];
-            }
-            if (i == j + 2 ){
-                L->Mat[i][j] = Mat[i][j];
+        for (int i = 0; i < Y; ++i) {
+            for (int j = 0; j < X; ++j) {
+                if (i == j + 1 ) {
+                    L->Mat[i][j] = Mat[i][j];
+                }
+                if (i == j + 2 ){
+                    L->Mat[i][j] = Mat[i][j];
+                }
             }
         }
+        return L;
     }
-    return L;
+
+    throw std::invalid_argument("LDiag func. for this type of matrix not implemented!");
 }
 
-Matrix* Matrix::U() {
-    if(!isBand){
-        throw"not implemented!";
-    }
-    Matrix *U = new Matrix(N,N);
+Matrix* Matrix::UDiag() {
+    if(isBand) {
+        Matrix *U = new Matrix(N, N);
 
-    for (int i = 0; i < Y; ++i) {
-        for (int j = 0; j < X; ++j) {
-            if (i + 1 == j) {
-                U->Mat[i][j] = Mat[i][j];
-            }
-            if (i + 2 == j){
-                U->Mat[i][j] = Mat[i][j];
+        for (int i = 0; i < Y; ++i) {
+            for (int j = 0; j < X; ++j) {
+                if (i + 1 == j) {
+                    U->Mat[i][j] = Mat[i][j];
+                }
+                if (i + 2 == j) {
+                    U->Mat[i][j] = Mat[i][j];
+                }
             }
         }
+        return U;
     }
-    return U;
+
+    throw std::invalid_argument("UDiag func. for this type of matrix not implemented!");
 }
 
 Matrix* Matrix::inv() {
-    if(!isDiagonal){
-        printf("not implemented");
-        throw;
-    }
-    Matrix* res = new Matrix(Y,X);
+    if(isDiagonal){
+        Matrix* res = new Matrix(Y,X);
 
-    for (int i = 0; i < N; ++i) {
-      res->Mat[i][i]=1/Mat[i][i];
+        for (int i = 0; i < N; ++i) {
+            res->Mat[i][i]=1/Mat[i][i];
+        }
+        return res;
     }
-    return res;
+    throw std::invalid_argument("inverting this type of matrix not implemented");
 }
 
 Matrix* Matrix::add(Matrix *B) {
 
     if(this->X != B->X || this->Y != B->Y){
-        printf("Wrong dimensions of matrix");
-        return nullptr;
+        throw std::invalid_argument("Wrong dimensions of matrix (add)");
     }
 
     Matrix* res = new Matrix(Y,X);
@@ -143,8 +143,7 @@ Matrix* Matrix::add(Matrix *B) {
 
 Matrix * Matrix::sub(Matrix *B) {
     if(this->X != B->X || this->Y != B->Y){
-        printf("Wrong dimensions of matrix");
-        return nullptr;
+        throw std::invalid_argument("Wrong dimensions of matrix (sub)");
     }
     Matrix* res = new Matrix(Y,X);
 
@@ -158,8 +157,7 @@ Matrix * Matrix::sub(Matrix *B) {
 
 Matrix *Matrix::mul(Matrix *B) {
     if(this->X!=B->Y){
-        printf("Wrong dimensions of matrix");
-        return nullptr;
+        throw std::invalid_argument("Wrong dimensions of matrix (mull)");
     }
     Matrix* result = new Matrix(this->Y,B->X);
     for(int i = 0; i < this->Y; i++ ) {
@@ -210,7 +208,9 @@ double Matrix::norm() {
 }
 
 void Matrix::eq(Matrix *B) {
-
+    if(X!=B->X || Y!=B->Y){
+        throw std::invalid_argument("Wrong dimensions of matrix (equal)");
+    }
     for (int i = 0; i < Y; ++i) {
         for (int j = 0; j < X; ++j) {
             Mat[i][j]=B->Mat[i][j];
@@ -228,9 +228,4 @@ Matrix *Matrix::neg() {
     return nm;
 }
 
-
-
-
-
-//dla macierzy wstęgowej bieżemy obecna iteracje, długość wstęgi
 

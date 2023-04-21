@@ -3,6 +3,7 @@
 //
 #include "matrixUtils.h"
 #include "Matrix.h"
+#include "Matrix.h"
 
 Matrix *GaussSeidel(Matrix *A, Matrix *b, double tol) {
     int N=b->Y;
@@ -10,9 +11,9 @@ Matrix *GaussSeidel(Matrix *A, Matrix *b, double tol) {
     Matrix* x_pr = new Matrix(N,1);
     x->ones();
 
-    Matrix* D  = A->D();
-    Matrix* L  = A->L();
-    Matrix* U  = A->U();
+    Matrix* D = A->Diag();
+    Matrix* L  = A->LDiag();
+    Matrix* U  = A->UDiag();
     Matrix* DL = D->add(L);
     double err=1;
 
@@ -20,7 +21,7 @@ Matrix *GaussSeidel(Matrix *A, Matrix *b, double tol) {
     while(err>tol){
         x_pr->eq(x);
 
-        //solving  A = (D+L)^-1 (b-U*x_pr) using forward substitution
+        //solving  A = (Diag+LDiag)^-1 (b-UDiag*x_pr) using forward substitution
 
         Matrix *ux=U->mul(x_pr);
         Matrix * b_ux=b->sub(ux);
@@ -82,11 +83,11 @@ Matrix* Jacobi(Matrix* A,Matrix* b,double tol){
     Matrix* x = new Matrix(N,1);
     x->ones();
 
-    Matrix* D  = A->D();
+    Matrix* D  = A->Diag();
     Matrix* DInv = D->inv();
 
-    Matrix* L  = A->L();
-    Matrix* U  = A->U();
+    Matrix* L  = A->LDiag();
+    Matrix* U  = A->UDiag();
 
     Matrix* LU = L->add(U);
 

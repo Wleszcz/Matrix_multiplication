@@ -14,7 +14,7 @@ public:
 
     double **Mat;
     Matrix(int y,int x);
-    void print();
+    void print() const;
     void createBandMatrix(const int index[]);
     Matrix* inv();
     Matrix* add(Matrix* B);
@@ -29,9 +29,9 @@ public:
 
 
 
-    Matrix* D();
-    Matrix* L();
-    Matrix* U();
+    Matrix* Diag();
+    Matrix* LDiag();
+    Matrix* UDiag();
 
     virtual ~Matrix();
 };
