@@ -40,26 +40,7 @@ void Matrix::print() const {
     printf("\n\n");
 }
 
-void Matrix::createBandMatrix(const int *index) {
-    int a1 = 5 + index[3];
-    int a2 = -1;
-    int a3 = a2;
-    isBand= true;
-    for (int i = 0; i < Y; ++i) {
-        for (int j = 0; j < X; ++j) {
-            if (i == j) {
-                Mat[i][j] = a1;
-            } else if (i == j + 1 || i + 1 == j) {
-                Mat[i][j] = a2;
-            } else if (i == j + 2 || i + 2 == j) {
-                Mat[i][j] = a3;
-//            } else {
-//                Mat[i][j] = 0;
-//            }
-            }
-        }
-    }
-}
+
 
 Matrix* Matrix::Diag() {
     if(isSquare) {

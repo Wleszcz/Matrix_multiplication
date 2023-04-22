@@ -5,10 +5,10 @@
 
 
 int main() {
-    const int index[] ={1,8,8,7,3,1};
+
     const int len = sizeof(index)/ sizeof(int);
 //    const int N = 100*9 +10*index[len-1]*index[len-2];
-    const int N=10;
+    const int N=1000;
 
     auto * A =new Matrix(N,N);
     A->createBandMatrix(index);
@@ -19,33 +19,25 @@ int main() {
     }
 
 
-    Matrix * x = Jacobi(A,b,1e-14);
+    Matrix * x = Jacobi(A,b,1e-9);
+    printf("Jacobi done\n");
     //x->print();
 
-    Matrix * x2 = GaussSeidel(A,b,1e-14);
-
+    Matrix * x2 = GaussSeidel(A,b,1e-9);
+    printf("Gauss done\n");
     //x2->print();
 
-    Matrix * he = new Matrix(3,3);
-    he->Mat[0][0]=1;
-    he->Mat[0][1]=-3;
-    he->Mat[0][2]=0;
 
-    he->Mat[1][0]=0;
-    he->Mat[1][1]=1;
-    he->Mat[1][2]=3;
-
-    he->Mat[2][0]=2;
-    he->Mat[2][1]=-10;
-    he->Mat[2][2]=2;
-
-
-    Matrix* x3 =LUFactorisationSolving(he,b);
+    Matrix* x3 =LUFactorisationSolving(A,b);
+    printf("Lu done\n");
+    //x3->print();
+    compare(x,x2,x3,1e-6);
 
    delete(A);
    delete(b);
    delete(x);
    delete(x2);
+   delete(x3);
 
     return 0;
 }

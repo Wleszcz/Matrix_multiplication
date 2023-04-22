@@ -5,6 +5,9 @@
 #include "Matrix.h"
 #include "Matrix.h"
 #include "stdio.h"
+#include "cstdlib"
+
+const int index[] ={1,8,8,7,3,1};
 
 Matrix ** LUFactorisation(Matrix *A){
 
@@ -165,12 +168,58 @@ Matrix* Jacobi(Matrix* A,Matrix* b,double tol){
 Matrix *LUFactorisationSolving(Matrix *A, Matrix *b) {
     Matrix** result;
     result = LUFactorisation(A);
-    printf("wynik faktoryzacji LU\n");
-    result[0]->print();
-    result[1]->print();
+//    printf("wynik faktoryzacji LU\n");
+//    result[0]->print();
+//    result[1]->print();
 
+
+    Matrix * y = forwardSubstitution(result[0], b);
+
+    Matrix * x = backwardSubstitution(result[1], y);
+
+    delete(y);
     delete(result[0]);
     delete(result[1]);
     delete(result);
+    return x;
+}
 
+void compare(Matrix* A,Matrix*B,Matrix*C,float tol){
+
+    if(A->Y==B->Y && A->Y==C->Y && A->X==B->X && A->X==C->X){
+        for (int i = 0; i < A->Y; ++i) {
+            for (int j = 0; j < A->X; ++j) {
+                if(!(abs(A->Mat[i][j] - B->Mat[i][j]) < tol
+                && abs(A->Mat[i][j]-C->Mat[i][j]) < tol)){
+                    printf("Matrixes have different values");
+
+                    return;
+                }
+            }
+        }
+        printf("Matrixes have the same values");
+        return;
+    }
+    printf("Matrixes have different sizes");
+}
+
+void createBandMatrix(Matrix* A) {
+    int a1 = 5 + index[3];
+    int a2 = -1;
+    int a3 = a2;
+    A->isBand= true;
+    for (int i = 0; i < A->Y; ++i) {
+        for (int j = 0; j < A->X; ++j) {
+            if (i == j) {
+                A->Mat[i][j] = a1;
+            } else if (i == j + 1 || i + 1 == j) {
+                A->Mat[i][j] = a2;
+            } else if (i == j + 2 || i + 2 == j) {
+                A->Mat[i][j] = a3;
+//            } else {
+//                Mat[i][j] = 0;
+//            }
+            }
+        }
+    }
 }
