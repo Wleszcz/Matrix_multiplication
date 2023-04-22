@@ -9,6 +9,10 @@ Matrix *Jacobi(Matrix* A,Matrix* b,double tol);
 
 Matrix *GaussSeidel(Matrix *A, Matrix *p, double tol);
 
+Matrix ** LUFactorisation(Matrix *A);
+Matrix * LUFactorisationSolving(Matrix * A, Matrix* b);
+
+
 Matrix *forwardSubstitution(Matrix *L, Matrix *b);
 Matrix* backwardSubstitution(Matrix* A, Matrix* b);
 #endif //NUMERYCZNE2_MATRIXUTILS_H

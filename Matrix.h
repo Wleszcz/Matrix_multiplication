@@ -22,6 +22,7 @@ public:
     Matrix* mul(Matrix*B);
     Matrix* neg();
     void ones();
+    void zeros();
     void del();
     Matrix* copy();
     double norm();

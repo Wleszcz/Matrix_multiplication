@@ -4,6 +4,45 @@
 #include "matrixUtils.h"
 #include "Matrix.h"
 #include "Matrix.h"
+#include "stdio.h"
+
+Matrix ** LUFactorisation(Matrix *A){
+
+    int rows = A->Y;
+    int cols = A->X;
+
+
+
+    Matrix * U = A->copy();
+    Matrix * L = new Matrix(rows,cols);
+
+
+    // L - macierz jednostkowa
+    for (int i = 0; i < rows; i++) {
+        L->Mat[i][i] = 1.0;
+    }
+
+    for (int k = 0; k < rows-1; k++) {
+        for (int i = k+1; i < rows; i++) {
+            double factor = U->Mat[i][k] / U->Mat[k][k];
+
+            // eliminacja Gaussa wiersza i z wykorzystaniem wiersza k
+            for (int j = k; j < cols; j++) {
+                U->Mat[i][j] -= factor * U->Mat[k][j];
+            }
+
+            L->Mat[i][k] = factor;
+        }
+    }
+
+
+    Matrix** result = new Matrix*[2];
+    result[0]=L;
+    result[1]=U;
+
+    return result;
+}
+
 
 Matrix *GaussSeidel(Matrix *A, Matrix *b, double tol) {
     int N=b->Y;
@@ -120,5 +159,18 @@ Matrix* Jacobi(Matrix* A,Matrix* b,double tol){
     delete(LU);
 
     return x;
+
+}
+
+Matrix *LUFactorisationSolving(Matrix *A, Matrix *b) {
+    Matrix** result;
+    result = LUFactorisation(A);
+    printf("wynik faktoryzacji LU\n");
+    result[0]->print();
+    result[1]->print();
+
+    delete(result[0]);
+    delete(result[1]);
+    delete(result);
 
 }

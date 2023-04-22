@@ -228,4 +228,12 @@ Matrix *Matrix::neg() {
     return nm;
 }
 
+void Matrix::zeros() {
+    for (int i = 0; i < Y; ++i) {
+        for (int j = 0; j < X; ++j) {
+            Mat[i][j]=0;
+        }
+    }
+}
+
 

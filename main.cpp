@@ -20,12 +20,27 @@ int main() {
 
 
     Matrix * x = Jacobi(A,b,1e-14);
-    x->print();
+    //x->print();
 
     Matrix * x2 = GaussSeidel(A,b,1e-14);
 
-    x2->print();
+    //x2->print();
 
+    Matrix * he = new Matrix(3,3);
+    he->Mat[0][0]=1;
+    he->Mat[0][1]=-3;
+    he->Mat[0][2]=0;
+
+    he->Mat[1][0]=0;
+    he->Mat[1][1]=1;
+    he->Mat[1][2]=3;
+
+    he->Mat[2][0]=2;
+    he->Mat[2][1]=-10;
+    he->Mat[2][2]=2;
+
+
+    Matrix* x3 =LUFactorisationSolving(he,b);
 
    delete(A);
    delete(b);
