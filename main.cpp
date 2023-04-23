@@ -60,7 +60,8 @@ int main() {
 
     //ZADANIE E - czasy
 
-    int sizes[]={100,250,500,1000,1500, 2000,2500,3000};
+    int sizes[]= {100, 250, 500, 1000, 1500, 2000,2500,3000};
+
 
     int len = sizeof(sizes)/sizeof(sizes[0]);
 
@@ -98,7 +99,7 @@ int main() {
 
 
 
-    std::ofstream file ("time.txt");
+    std::ofstream file ("../time.txt");
     if (file.is_open())
     {
         for (int i = 0; i < 4; ++i) {
@@ -123,7 +124,7 @@ int main() {
     }
 
     exec("conda activate SI");
-    exec("python -u graph.py");
+    exec("python -u ../graph.py");
 
     return 0;
 }

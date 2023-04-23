@@ -1,0 +1,17 @@
+wykres znajduje się w katalogu cmake-build-debug
+
+Wynik zadania C - dla metod iteracyjnych wartości nie zbiegają się
+
+Obserwacje:
+
+Metoda Gaussa-Seidla okazała się najszybszą z zaimplementowanych, 
+szczególnie widoczne było to dla macierzy N>2000
+
+Metoda bezpośrednia Faktoryzacji LU jest bardzo czasochłonna natomiast
+wynik obarczony jest pomijalnym błędem, czego nie można powiedzieć o metodach iteracyjnch
+
+
+Dodatkowa obserwacja:
+Dla wielokrotnego rozwiązywania układu z niezmienna macierzą A zdecydowanie szybsza była 
+by faktoryzacja LU, ponieważ macierze L oraz U liczylibyśmy tylko raz, a to ten proces 
+jest najbardziej czasochłonny
