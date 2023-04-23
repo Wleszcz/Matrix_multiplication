@@ -6,8 +6,8 @@
 #include "Matrix.h"
 #include "stdio.h"
 #include "cstdlib"
-
-const int index[] ={1,8,8,7,3,1};
+#include <iostream>
+#include <chrono>
 
 Matrix ** LUFactorisation(Matrix *A){
 
@@ -47,7 +47,8 @@ Matrix ** LUFactorisation(Matrix *A){
 }
 
 
-Matrix *GaussSeidel(Matrix *A, Matrix *b, double tol) {
+Matrix *GaussSeidel(Matrix *A, Matrix *b, double tol,int * t) {
+    bool failed= false;
     int N=b->Y;
     Matrix* x = new Matrix(N,1);
     Matrix* x_pr = new Matrix(N,1);
@@ -60,6 +61,8 @@ Matrix *GaussSeidel(Matrix *A, Matrix *b, double tol) {
     double err=1;
 
     int iter =0;
+
+    auto start_time = std::chrono::high_resolution_clock::now();
     while(err>tol){
         x_pr->eq(x);
 
@@ -77,13 +80,24 @@ Matrix *GaussSeidel(Matrix *A, Matrix *b, double tol) {
         delete(ux);
         delete(b_ux);
 
-        if(iter>1000) break;
+        if(iter>MAX_iter){
+            printf ("Couldn't solve in %d iterations\n\n",MAX_iter);
+            delete(x);
+            x= nullptr;
+            failed= true;
+            break;
+        }
     }
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto time = end_time - start_time;
+
     delete(L);
     delete(D);
     delete(U);
     delete(DL);
     delete(x_pr);
+    if(!failed)std::cout << "Gauss "<< N << " X " << N <<"    done in "<< iter << " iterations and took  " <<time/std::chrono::milliseconds(1) << "ms to run.\n";
+    * t= std::chrono::duration_cast<std::chrono::milliseconds >(time).count();
     return x;
 
 }
@@ -120,7 +134,8 @@ Matrix* backwardSubstitution(Matrix* A, Matrix* b) {
 }
 
 
-Matrix* Jacobi(Matrix* A,Matrix* b,double tol){
+Matrix* Jacobi(Matrix* A,Matrix* b,double tol,int * t){
+    bool failed= false;
     int N=b->Y;
     Matrix* x = new Matrix(N,1);
     x->ones();
@@ -137,6 +152,8 @@ Matrix* Jacobi(Matrix* A,Matrix* b,double tol){
 
     int iter =0;
 
+    auto start_time = std::chrono::high_resolution_clock::now();
+
     while(err > tol) {
         Matrix* LUx=LU->mul(x);
         Matrix* DInvLux=DInv->mul(LUx);
@@ -152,31 +169,46 @@ Matrix* Jacobi(Matrix* A,Matrix* b,double tol){
         delete(DinvB);
 
         iter++;
-        if(iter>1000) break;
-
+        if(iter>MAX_iter){
+            printf ("Couldn't solve in %d iterations\n\n",MAX_iter);
+            failed= true;
+            delete(x);
+            x= nullptr;
+            break;
+        }
     }
+
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto time = end_time - start_time;
+
+
 
     delete(L);
     delete(D);
     delete(U);
     delete(LU);
 
-    return x;
 
+    if(!failed)std::cout << "Jacobi "<< N << " X " << N <<"   done in "<< iter << " iterations and took  " <<time/std::chrono::milliseconds(1) << "ms to run.\n";
+    * t= std::chrono::duration_cast<std::chrono::milliseconds >(time).count();
+
+    return x;
 }
 
-Matrix *LUFactorisationSolving(Matrix *A, Matrix *b) {
+Matrix *LUFactorisationSolving(Matrix *A, Matrix *b,int* t) {
     Matrix** result;
+
+    auto start_time = std::chrono::high_resolution_clock::now();
+
     result = LUFactorisation(A);
-//    printf("wynik faktoryzacji LU\n");
-//    result[0]->print();
-//    result[1]->print();
-
-
     Matrix * y = forwardSubstitution(result[0], b);
-
     Matrix * x = backwardSubstitution(result[1], y);
 
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto time = end_time - start_time;
+
+    * t= std::chrono::duration_cast<std::chrono::milliseconds >(time).count();
+    std::cout << "LU "<< A->X << " X " << A->X <<"       done, took  " <<time/std::chrono::milliseconds(1) << "ms to run.\n";
     delete(y);
     delete(result[0]);
     delete(result[1]);
@@ -184,29 +216,54 @@ Matrix *LUFactorisationSolving(Matrix *A, Matrix *b) {
     return x;
 }
 
-void compare(Matrix* A,Matrix*B,Matrix*C,float tol){
-
+void compare(Matrix* A,Matrix*B,Matrix*C,double tol){
+    if(A==NULL || B==NULL || C==NULL){
+        printf("invalid matrix (NULL)\n\n");
+        return;
+    }
     if(A->Y==B->Y && A->Y==C->Y && A->X==B->X && A->X==C->X){
         for (int i = 0; i < A->Y; ++i) {
             for (int j = 0; j < A->X; ++j) {
-                if(!(abs(A->Mat[i][j] - B->Mat[i][j]) < tol
-                && abs(A->Mat[i][j]-C->Mat[i][j]) < tol)){
-                    printf("Matrixes have different values");
+                double Aw = A->Mat[i][j];
+                double Bw = B->Mat[i][j];
+                double Cw = C->Mat[i][j];
 
+                if(Aw-Bw > tol || Aw-Cw > tol || Bw-Aw > tol || Cw-Aw > tol){
+                    printf("Matrixes have different values\n\n");
                     return;
                 }
             }
         }
-        printf("Matrixes have the same values");
+        printf("Matrixes have the same values\n\n");
         return;
     }
-    printf("Matrixes have different sizes");
+    printf("Matrixes have different sizes\n\n");
 }
 
-void createBandMatrix(Matrix* A) {
-    int a1 = 5 + index[3];
-    int a2 = -1;
-    int a3 = a2;
+void compare(Matrix* A,Matrix*B,double tol){
+    if(A==NULL || B==NULL){
+        printf("invalid matrix (NULL)\n\n");
+        return;
+    }
+    if(A->Y==B->Y && A->X==B->X){
+        for (int i = 0; i < A->Y; ++i) {
+            for (int j = 0; j < A->X; ++j) {
+                double Aw = A->Mat[i][j];
+                double Bw = B->Mat[i][j];
+
+                if(Aw-Bw > tol  || Bw-Aw > tol){
+                    printf("Matrixes have different values\n\n");
+                    return;
+                }
+            }
+        }
+        printf("Matrixes have the same values\n\n");
+        return;
+    }
+    printf("Matrixes have different sizes\n\n");
+}
+
+void createBandMatrix(Matrix* A, int a1, int a2, int a3) {
     A->isBand= true;
     for (int i = 0; i < A->Y; ++i) {
         for (int j = 0; j < A->X; ++j) {
